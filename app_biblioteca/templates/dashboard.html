@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Biblioteca</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=3">
+    
+    <style>
+        .card-stat {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .card-stat .card-icon {
+            font-size: 2.5rem;
+            opacity: 0.7;
+        }
+        .card-stat .card-title {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .card-stat .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        .card-stat .card-footer-stat {
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0 0 10px 10px;
+        }
+        .card-activity {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .card-activity .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .table-activity th {
+            border-top: none;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .main-content {
+            background-color: #f5f7fa;
+            min-height: calc(100vh - 60px);
+            padding: 20px;
+        }
+        .page-header {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .progress {
+            background-color: #e9ecef;
+            border-radius: 3px;
+            height: 6px;
+        }
+        .progress-bar.dynamic-width {
+            transition: width 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/topbar.html' %}
+    {% include 'partials/navbar.html' %}
+    <div class="main-content">  
+        <div class="container-fluid">
+            <div class="page-header">
+                <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+                <div class="text-muted">Resumen general del sistema</div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card card-stat bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title"><i class="bi bi-book me-2"></i>Libros</h5>
+                                    <p class="card-value">{{ stats.total_libros }}</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer-stat">
+                            <i class="bi bi-arrow-up-circle"></i> {{ stats.libros_prestados }} prestados actualmente
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tarjeta Préstamos -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card card-stat bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title"><i class="bi bi-clipboard-check me-2"></i>Préstamos</h5>
+                                    <p class="card-value">{{ stats.prestamos_activos }}</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="bi bi-clipboard-data"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer-stat">
+                            <i class="bi bi-check-circle"></i> {{ stats.prestamos_completados }} completados
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tarjeta Lectores -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card card-stat bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title"><i class="bi bi-people me-2"></i>Lectores</h5>
+                                    <p class="card-value">{{ stats.total_lectores }}</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer-stat">
+                            <i class="bi bi-graph-up"></i> Activos en el sistema
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tarjeta Usuarios -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card card-stat bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title"><i class="bi bi-person-lines-fill me-2"></i>Usuarios</h5>
+                                    <p class="card-value">{{ stats.total_usuarios }}</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer-stat">
+                            <i class="bi bi-person-check"></i> {{ stats.usuarios_activos }} activos
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Actividades -->
+            <div class="row">
+                <!-- Últimos Préstamos -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card card-activity h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i> Últimos Préstamos</h5>
+                            <a href="{% url 'main' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-activity">
+                                    <thead>
+                                        <tr>
+                                            <th>Libro</th>
+                                            <th>Lector</th>
+                                            <th>Fecha</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prestamo in ultimos_prestamos %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ prestamo.book.title }}</strong><br>
+                                                <small class="text-muted">{{ prestamo.book.author }}</small>
+                                            </td>
+                                            <td>{{ prestamo.reader.name }}</td>
+                                            <td>{{ prestamo.date|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if prestamo.return_date %}
+                                                    <span class="badge bg-success">Devuelto</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Prestado</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Libros más Prestados -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card card-activity h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-trophy me-2"></i> Libros más Prestados</h5>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Ver ranking</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-activity">
+                                    <thead>
+                                        <tr>
+                                            <th>Posición</th>
+                                            <th>Libro</th>
+                                            <th>Préstamos</th>
+                                            <th>Popularidad</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for libro in libros_mas_prestados %}
+                                        <tr>
+                                            <td class="fw-bold">#{{ forloop.counter }}</td>
+                                            <td>
+                                                <strong>{{ libro.title }}</strong><br>
+                                                <small class="text-muted">{{ libro.author }}</small>
+                                            </td>
+                                            <td>{{ libro.num_prestamos }}</td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-success dynamic-width" 
+                                                         data-width="{{ libro.porcentaje }}"
+                                                         style="width: 0%"
+                                                         aria-valuenow="{{ libro.num_prestamos }}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">{{ libro.porcentaje|floatformat:0 }}%</small>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.dynamic-width').forEach(function(el) {
+            const width = parseFloat(el.dataset.width) || 0;
+            setTimeout(() => {
+                el.style.width = width + '%';
+            }, 100);
+        });
+        $('.card-stat').each(function(i) {
+            $(this).delay(i * 200).animate({ opacity: 1 }, 400);
+        });
+    });
+    </script>
+</body>
+</html>

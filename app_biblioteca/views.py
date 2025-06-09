@@ -14,6 +14,8 @@ from django.shortcuts import render, redirect
 from .forms import RegistroUsuarioForm
 from django.contrib.auth import logout as auth_logout
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
+from django.db.models import Count
 
 def logout(request):
     auth_logout(request)
@@ -309,3 +311,38 @@ def editGenre(request, id):
       error = e
       genre = None
    return render(request, 'editGenre.html', {'genre_form': genre_form, 'error':error, 'genre': genre})
+@login_required(login_url='/app_biblioteca/login/')
+def dashboard(request):
+    stats = {
+        'total_usuarios': User.objects.count(),
+        'usuarios_activos': User.objects.filter(is_active=True).count(),
+        'total_libros': Book.objects.filter(is_active=True).count(),
+        'libros_prestados': Lending.objects.filter(real_return_date__isnull=True).count(),
+        'total_lectores': Reader.objects.filter(is_active=True).count(),
+        'total_editoriales': Editorial.objects.filter(is_active=True).count(),
+        'total_generos': Genre.objects.filter(is_active=True).count(),
+        'total_idiomas': Language.objects.filter(is_active=True).count(),
+        'prestamos_activos': Lending.objects.filter(real_return_date__isnull=True).count(),
+        'prestamos_completados': Lending.objects.filter(real_return_date__isnull=False).count(),
+    }
+    
+
+    ultimos_prestamos = Lending.objects.select_related('book', 'reader').order_by('-date')[:5]
+   
+    libros_mas_prestados = Book.objects.filter(
+        is_active=True
+    ).annotate(
+        num_prestamos=Count('lending')
+    ).order_by('-num_prestamos')[:5]
+
+
+    max_prestamos = libros_mas_prestados[0].num_prestamos if libros_mas_prestados else 1  
+    
+    for libro in libros_mas_prestados:
+        libro.porcentaje = min((libro.num_prestamos / max_prestamos) * 100, 100)
+    
+    return render(request, 'dashboard.html', {
+        'stats': stats,
+        'ultimos_prestamos': ultimos_prestamos,
+        'libros_mas_prestados': libros_mas_prestados
+    })

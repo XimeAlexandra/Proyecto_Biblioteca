@@ -2,6 +2,8 @@ from app_biblioteca import views
 from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import dashboard
+
 
 urlpatterns = [
     path(r'', views.main, name='main'), # lendings
@@ -54,4 +56,6 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
+
+    path('dashboard/', dashboard, name='dashboard'),
 ]
